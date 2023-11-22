@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController pageController = TextEditingController(text: '1');
   final TextEditingController baseUrlController = TextEditingController(
       text:
-          'https://api.digikala.com/v1/categories/dental-hygienist/search/?has_selling_stock=1&sort=7&seo_url=%2Fcategory-cell-phone-data-cable%2F%3Fhas_selling_stock%3D1%26page%3D24&sort=7');
+          'https://api.digikala.com/v1/categories/dental-hygienist/search/?sort=7');
   final ScrollController scrollController = ScrollController();
 
   List<Product> products = [];
@@ -160,6 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 children: [
                   Expanded(
+                    flex: 4,
                     child: TextField(
                       controller: baseUrlController,
                       decoration: InputDecoration(hintText: 'BaseUrl'),
