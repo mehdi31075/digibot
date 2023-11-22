@@ -32,7 +32,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String htmlContent = '';
-  final TextEditingController pageController = TextEditingController();
+  bool isLoading = false;
+  final TextEditingController pageController = TextEditingController(text: '1');
   final TextEditingController baseUrlController = TextEditingController(
       text:
           'https://api.digikala.com/v1/categories/dental-hygienist/search/?has_selling_stock=1&sort=7&seo_url=%2Fcategory-cell-phone-data-cable%2F%3Fhas_selling_stock%3D1%26page%3D24&sort=7');
@@ -113,6 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
       'x-web-optimize-response': '1'
     };
     var dio = Dio();
+    setState(() {
+      isLoading = true;
+    });
     var response = await dio.request(
       '$baseUrl&page=$page',
       options: Options(
@@ -120,7 +124,9 @@ class _MyHomePageState extends State<MyHomePage> {
         headers: headers,
       ),
     );
-
+    setState(() {
+      isLoading = false;
+    });
     if (response.statusCode == 200) {
       print(json.encode(response.data));
       setState(() {
@@ -220,7 +226,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         )
                         .toList(),
-                    if (int.tryParse(pageController.text) != null)
+                    if (int.tryParse(pageController.text) != null &&
+                        products.isNotEmpty)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -264,6 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
+              if (isLoading == true) const CircularProgressIndicator(),
             ],
           ),
         ),
