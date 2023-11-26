@@ -22,11 +22,7 @@ jobs:
     - name: Clean flutter
       run: flutter clean
     - name: Clean pub cache
-      run: flutter pub cache clean
-    - name: Get dependencies
-      run: flutter pub upgrade
-    - name: Run build runner
-      run: flutter pub run build_runner build --delete-conflicting-outputs
+      run: flutter pub get
     - name: Start release android build
       run: flutter build apk --target-platform android-arm,android-arm64
     - name: Upload debug APK to Github Artifacts
