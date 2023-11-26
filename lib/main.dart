@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -278,16 +279,22 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              fetchData(
-                                page: (int.parse(pageController.text) + 1)
-                                    .toString(),
+                              scrollController
+                                  .animateTo(0,
+                                      duration:
+                                          const Duration(milliseconds: 1000),
+                                      curve: Curves.bounceIn)
+                                  .then(
+                                (value) {
+                                  pageController.text =
+                                      (int.parse(pageController.text) + 1)
+                                          .toString();
+                                  return fetchData(
+                                    page: (int.parse(pageController.text) + 1)
+                                        .toString(),
+                                  );
+                                },
                               );
-                              pageController.text =
-                                  (int.parse(pageController.text) + 1)
-                                      .toString();
-                              scrollController.animateTo(0,
-                                  duration: Duration.zero,
-                                  curve: Curves.bounceIn);
                             },
                             child: Text('بعدی'),
                           ),

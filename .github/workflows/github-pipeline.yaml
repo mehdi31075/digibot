@@ -21,7 +21,7 @@ jobs:
         flutter-version: "3.16.0"
     - name: Clean flutter
       run: flutter clean
-    - name: Clean pub cache
+    - name: Clean pub get
       run: flutter pub get
     - name: Start release android build
       run: flutter build apk --target-platform android-arm,android-arm64
@@ -29,5 +29,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: digi_apk
-        path: ${{steps.sign_app.outputs.signedReleaseFile}}
-        retention-days: 3
+        path: /digibot/digiapk
