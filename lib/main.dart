@@ -22,6 +22,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
+enum SortTypes {
+  jadid(1, 'جدید ترین'),
+  porBazdid(4, 'پر بازدید ترین'),
+  porForoush(7, 'پر فروش ترین'),
+  arzan(20, 'ارزان ترین'),
+  geran(21, 'گران ترین'),
+  mortabet(22, 'مرتبط ترین'),
+  sari(25, 'سریعترین ارسال'),
+  pishnahad(27, 'پیشنهاد خریداران'),
+  montakhab(29, 'منتخب');
+
+  final int id;
+  final String title;
+  const SortTypes(this.id, this.title);
+}
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -34,10 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String htmlContent = '';
   bool isLoading = false;
   final TextEditingController pageController = TextEditingController(text: '1');
-  final TextEditingController baseUrlController = TextEditingController(
-      text:
-          'https://api.digikala.com/v1/categories/dental-hygienist/search/?sort=7');
+  final TextEditingController categoryController = TextEditingController();
+  final TextEditingController queriesController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  SortTypes selectedSortType = SortTypes.porForoush;
 
   List<Product> products = [];
   Map<String, DetailedProduct?> singleProducts = {};
@@ -88,10 +104,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> fetchData(
-    String url, {
+  Future<void> fetchData({
     required String page,
-    required String baseUrl,
   }) async {
     var headers = {
       'authority': 'api.digikala.com',
@@ -117,8 +131,11 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       isLoading = true;
     });
+    final url =
+        'https://api.digikala.com/v1${(categoryController.text).isNotEmpty ? '/categories/${categoryController.text}' : ''}/search/?sort=${selectedSortType.id}&page=$page&${queriesController.text}';
+    print(url);
     var response = await dio.request(
-      '$baseUrl&page=$page',
+      url,
       options: Options(
         method: 'GET',
         headers: headers,
@@ -128,7 +145,6 @@ class _MyHomePageState extends State<MyHomePage> {
       isLoading = false;
     });
     if (response.statusCode == 200) {
-      print(json.encode(response.data));
       setState(() {
         products =
             ProductsListResponse.fromJson(response.data).data?.products ?? [];
@@ -155,16 +171,42 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Text(
-                  'مرتبط ترین=۲۲   پربازدید=۴   جدیدترین=۱   پرفروش ترین=۷      ارزان ترین=۲۰    گران ترین=۲۱    سریع ترین ارسال=۲۵     پیشنهاد خریداران=۲۷     منتخب=۲۹'),
               Row(
                 children: [
                   Expanded(
-                    flex: 4,
                     child: TextField(
-                      controller: baseUrlController,
-                      decoration: InputDecoration(hintText: 'BaseUrl'),
+                      controller: categoryController,
+                      decoration: InputDecoration(hintText: 'Category'),
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: queriesController,
+                      decoration: InputDecoration(hintText: 'Queries'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                  ),
+                  DropdownButton<SortTypes>(
+                    items: SortTypes.values.map((SortTypes value) {
+                      return DropdownMenuItem<SortTypes>(
+                        value: value,
+                        child: Text(value.title),
+                      );
+                    }).toList(),
+                    value: selectedSortType,
+                    onChanged: (value) {
+                      setState(() {
+                        if (value != null) selectedSortType = value;
+                      });
+                      fetchData(
+                        page: pageController.text,
+                      );
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.all(32),
@@ -179,9 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               TextButton(
                 onPressed: () => fetchData(
-                  pageController.text,
                   page: pageController.text,
-                  baseUrl: baseUrlController.text,
                 ),
                 child: Text('Scrap'),
               ),
@@ -216,7 +256,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                             [])
                                         .map((e) => (e.url ?? []).isNotEmpty
                                             ? Image.network(
-                                                e.webpUrl!.first.replaceAll('quality,q_90', 'quality,q_10'),
+                                                e.webpUrl!.first.replaceAll(
+                                                    'quality,q_90',
+                                                    'quality,q_10'),
                                                 height: 200,
                                               )
                                             : Container())
@@ -235,10 +277,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           TextButton(
                             onPressed: () {
                               fetchData(
-                                pageController.text,
                                 page: (int.parse(pageController.text) + 1)
                                     .toString(),
-                                baseUrl: baseUrlController.text,
                               );
                               pageController.text =
                                   (int.parse(pageController.text) + 1)
@@ -253,10 +293,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             TextButton(
                               onPressed: () {
                                 fetchData(
-                                  pageController.text,
                                   page: (int.parse(pageController.text) - 1)
                                       .toString(),
-                                  baseUrl: baseUrlController.text,
                                 );
                                 pageController.text =
                                     (int.parse(pageController.text) - 1)
