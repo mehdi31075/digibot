@@ -256,9 +256,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                             [])
                                         .map((e) => (e.url ?? []).isNotEmpty
                                             ? Image.network(
-                                                e.webpUrl!.first.replaceAll(
-                                                    'quality,q_90',
-                                                    'quality,q_10'),
+                                                e.webpUrl!.first
+                                                    .replaceAll('quality,q_90',
+                                                        'quality,q_10')
+                                                    .replaceAll('h_800,w_800',
+                                                        'h_600,w_600'),
                                                 height: 200,
                                               )
                                             : Container())
