@@ -28,6 +28,6 @@ jobs:
     - name: Upload debug APK to Github Artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: otosoft-apk
+        name: digi_apk
         path: ${{steps.sign_app.outputs.signedReleaseFile}}
         retention-days: 3
